@@ -4,6 +4,9 @@ https://github.com/knopflerfish/knopflerfish.org
 Modified for compatibility with OGEMA:
 https://github.com/ogema/ogema
 
+Build: 
+mvn clean install
+
 Changes:
  * SecurityManager & FrameworkPolicy: avoid endless loop during class loading with activated security
    -- use default security manager for FilePermission checks
