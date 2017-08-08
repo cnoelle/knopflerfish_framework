@@ -1,0 +1,10 @@
+.classpath
+.project
+.settings/
+nbproject
+target/
+build/
+*~
+pom.xml.versionsBackup
+pom.xml.releaseBackup
+*.swp
