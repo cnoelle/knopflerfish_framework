@@ -45,7 +45,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.Vector;
 
-import org.knopflerfish.framework.permissions.ConditionalPermissionAdminImpl;
 import org.knopflerfish.framework.permissions.PermissionsHandle;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleEvent;

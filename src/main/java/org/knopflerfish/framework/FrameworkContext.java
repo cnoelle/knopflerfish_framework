@@ -408,7 +408,7 @@ public class FrameworkContext  {
     bundleHooks = new BundleHooks(this);
     resolverHooks = new ResolverHooks(this);
     weavingHooks = new WeavingHooks(this);
-
+    
     systemBundle.initSystemBundle();
 
     bundles = new Bundles(this);
@@ -512,7 +512,7 @@ public class FrameworkContext  {
     storage.close();
     storage = null;
 
-    perm = new PermissionOps();
+    perm = new PermissionOps(this);
 
     synchronized (globalFwLock) {
       if (--smUse == 0) {

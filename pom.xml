@@ -6,7 +6,7 @@
     <artifactId>org.knopflerfish.framework</artifactId>
     <name>Knopflerfish framework bundle (forked)</name>
     <description>Knopflerfish framework bundle (forked for OGEMA compatibility)</description>
-    <version>8.0.4_1</version>
+    <version>8.0.4_2</version>
 
     <packaging>bundle</packaging>
 	
