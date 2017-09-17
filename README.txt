@@ -15,3 +15,6 @@ Changes:
    -- register ConditionalPermissionAdmin even if security is inactive
  * SystemBundle: ensure org.osgi.* packages are exported
    -- additional package exports read from included file
+ * FrameworkContext: fixed an error when a second framework instance is launched in the same VM
+   -- on init, clear URL.class and URLConnection.class static variables by reflection, to 
+ 	enable a reinitialisation

@@ -35,10 +35,14 @@
 package org.knopflerfish.framework;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.net.ContentHandler;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -236,6 +240,7 @@ public class FrameworkContext  {
   static void setupURLStreamHandleFactory() {
     ServiceURLStreamHandlerFactory res = new ServiceURLStreamHandlerFactory();
     try {
+      clearStreamHandlerByReflection();
       URL.setURLStreamHandlerFactory(res);
       systemUrlStreamHandlerFactory = res;
     } catch (final Throwable e) {
@@ -243,7 +248,33 @@ public class FrameworkContext  {
          +"continuing without OSGi service URL handler (" +e +")");
     }
   }
-
+  
+  private static ServiceURLStreamHandlerFactory clearStreamHandlerByReflection() {
+	  final Class<URL> cl = URL.class;
+	  try {
+		  final Field factory = cl.getDeclaredField("factory");
+		  factory.setAccessible(true);
+		  factory.set(null, null);
+	  } catch (Exception e) {
+		  e.printStackTrace();
+	  }
+	  return null;
+  }
+  
+  private static ServiceContentHandlerFactory  clearContentHandlerByReflection() {
+	  final Class<URLConnection> cl = URLConnection.class;
+	  try {
+		  final Field factory = cl.getDeclaredField("factory");
+		  factory.setAccessible(true);
+		  factory.set(null, null);
+		  final Field handlers = cl.getDeclaredField("handlers");
+		  handlers.setAccessible(true);
+		  handlers.set(null, new Hashtable<String, ContentHandler>());
+	  } catch (Exception e) {
+		  e.printStackTrace();
+	  }
+	  return null;
+  }
 
   /**
    * Contruct a framework context
@@ -331,7 +362,7 @@ public class FrameworkContext  {
       if (props.REGISTERSERVICEURLHANDLER) {
         // Check if we already have registered one
         if (systemUrlStreamHandlerFactory == null) {
-          setupURLStreamHandleFactory();
+       		setupURLStreamHandleFactory();
         }
         urlStreamHandlerFactory = systemUrlStreamHandlerFactory;
         if (systemContentHandlerFactory != null) {
@@ -339,6 +370,7 @@ public class FrameworkContext  {
         } else {
           contentHandlerFactory   = new ServiceContentHandlerFactory(this);
           try {
+        	clearContentHandlerByReflection();
             URLConnection.setContentHandlerFactory(contentHandlerFactory);
             systemContentHandlerFactory   = contentHandlerFactory;
           } catch (final Throwable e) {
