@@ -38,10 +38,11 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.net.ContentHandler;
+import java.net.ContentHandlerFactory;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.URLStreamHandlerFactory;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
@@ -240,7 +241,7 @@ public class FrameworkContext  {
   static void setupURLStreamHandleFactory() {
     ServiceURLStreamHandlerFactory res = new ServiceURLStreamHandlerFactory();
     try {
-      clearStreamHandlerByReflection();
+      clearStreamHandlerByReflection(false);
       URL.setURLStreamHandlerFactory(res);
       systemUrlStreamHandlerFactory = res;
     } catch (final Throwable e) {
@@ -249,23 +250,32 @@ public class FrameworkContext  {
     }
   }
   
-  private static ServiceURLStreamHandlerFactory clearStreamHandlerByReflection() {
+  private static void clearStreamHandlerByReflection(boolean check) {
 	  final Class<URL> cl = URL.class;
 	  try {
 		  final Field factory = cl.getDeclaredField("factory");
 		  factory.setAccessible(true);
+		  if (check) {
+			  final URLStreamHandlerFactory existing = (URLStreamHandlerFactory) factory.get(null);
+			  if (!(existing instanceof ServiceURLStreamHandlerFactory))
+				  return;
+		  }
 		  factory.set(null, null);
 	  } catch (Exception e) {
 		  e.printStackTrace();
 	  }
-	  return null;
   }
   
-  private static ServiceContentHandlerFactory  clearContentHandlerByReflection() {
+  private static void clearContentHandlerByReflection(boolean check) {
 	  final Class<URLConnection> cl = URLConnection.class;
 	  try {
 		  final Field factory = cl.getDeclaredField("factory");
 		  factory.setAccessible(true);
+		  if (check) {
+			  final ContentHandlerFactory existing = (ContentHandlerFactory) factory.get(null);
+			  if (!(existing instanceof ServiceContentHandlerFactory))
+				  return;
+		  }
 		  factory.set(null, null);
 		  final Field handlers = cl.getDeclaredField("handlers");
 		  handlers.setAccessible(true);
@@ -273,7 +283,6 @@ public class FrameworkContext  {
 	  } catch (Exception e) {
 		  e.printStackTrace();
 	  }
-	  return null;
   }
 
   /**
@@ -370,7 +379,7 @@ public class FrameworkContext  {
         } else {
           contentHandlerFactory   = new ServiceContentHandlerFactory(this);
           try {
-        	clearContentHandlerByReflection();
+        	clearContentHandlerByReflection(false);
             URLConnection.setContentHandlerFactory(contentHandlerFactory);
             systemContentHandlerFactory   = contentHandlerFactory;
           } catch (final Throwable e) {
@@ -513,13 +522,15 @@ public class FrameworkContext  {
 
     if(props.REGISTERSERVICEURLHANDLER) {
       urlStreamHandlerFactory.removeFramework(this);
-      // Since handlers can only be registered once, keep them in this
-      // case.
-    } else {
+    } 
+//    else {
       urlStreamHandlerFactory = null;
       contentHandlerFactory   = null;
-    }
-
+//    }
+      
+    clearContentHandlerByReflection(true);
+    clearStreamHandlerByReflection(true);
+      
     bundles.clear();
     bundles = null;
 
