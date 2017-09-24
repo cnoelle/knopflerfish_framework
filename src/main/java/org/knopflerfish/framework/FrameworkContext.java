@@ -37,6 +37,7 @@ package org.knopflerfish.framework;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
 import java.net.ContentHandler;
 import java.net.ContentHandlerFactory;
 import java.net.URL;
@@ -260,6 +261,9 @@ public class FrameworkContext  {
 			  if (!(existing instanceof ServiceURLStreamHandlerFactory))
 				  return;
 		  }
+		  Field modifiersField = Field.class.getDeclaredField("modifiers");
+	      modifiersField.setAccessible(true);
+	      modifiersField.setInt(factory, factory.getModifiers() & ~Modifier.FINAL);
 		  factory.set(null, null);
 	  } catch (Exception e) {
 		  e.printStackTrace();
@@ -278,6 +282,9 @@ public class FrameworkContext  {
 		  }
 		  factory.set(null, null);
 		  final Field handlers = cl.getDeclaredField("handlers");
+		  Field modifiersField = Field.class.getDeclaredField("modifiers");
+	      modifiersField.setAccessible(true);
+	      modifiersField.setInt(handlers, handlers.getModifiers() & ~Modifier.FINAL);
 		  handlers.setAccessible(true);
 		  handlers.set(null, new Hashtable<String, ContentHandler>());
 	  } catch (Exception e) {
