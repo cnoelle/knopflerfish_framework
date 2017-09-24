@@ -535,8 +535,10 @@ public class FrameworkContext  {
       contentHandlerFactory   = null;
 //    }
       
-    clearContentHandlerByReflection(true);
-    clearStreamHandlerByReflection(true);
+      // better do this on initialization only, so that a new handler will be registered immediately
+      // otherwise, for instance the gogo shell fails to start when a framework update is triggered in certain situations
+//    clearContentHandlerByReflection(true);
+//    clearStreamHandlerByReflection(true);
       
     bundles.clear();
     bundles = null;
